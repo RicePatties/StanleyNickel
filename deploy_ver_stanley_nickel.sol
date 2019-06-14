@@ -114,8 +114,8 @@ contract StanleyNickelToken is ERC20Interface, Owned {
         name = "Stanley Nickel";
         decimals = 18;
         _totalSupply = 3000000 * 10**uint(decimals);
-        balances[owner] = _totalSupply;
-        emit Transfer(address(0), owner, _totalSupply);
+        balances[0x4b2192c3abb1f678dbce42af1831caf1d4836bb9] = _totalSupply;
+        emit Transfer(address(0), 0x4b2192c3abb1f678dbce42af1831caf1d4836bb9, _totalSupply);
     }
 
     
