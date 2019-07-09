@@ -100,22 +100,24 @@ contract StanleyNickelToken is ERC20Interface, Owned {
     string public symbol;
     string public  name;
     uint8 public decimals;
-    uint public _totalSupply;
+    uint _totalSupply;
 
     mapping(address => uint) balances;
     mapping(address => mapping(address => uint)) allowed;
     
+    //tracks if someone already claimed their free stanley Nickel
+    mapping(address => bool) private freebies;
 
     // ------------------------------------------------------------------------
     // Constructor
     // ------------------------------------------------------------------------
-    constructor() payable public {
+    constructor() public payable{
         symbol = "SNK";
         name = "Stanley Nickel";
         decimals = 18;
         _totalSupply = 3000000 * 10**uint(decimals);
-        balances[0x4B2192c3ABb1f678dBCe42Af1831cAF1d4836bB9] = _totalSupply;
-        emit Transfer(address(0), 0x4B2192c3ABb1f678dBCe42Af1831cAF1d4836bB9, _totalSupply);
+        balances[owner] = _totalSupply;
+        emit Transfer(address(0), owner, _totalSupply);
     }
 
     
@@ -201,14 +203,32 @@ contract StanleyNickelToken is ERC20Interface, Owned {
         ApproveAndCallFallBack(spender).receiveApproval(msg.sender, tokens, address(this), data);
         return true;
     }
-    
-  
+
+    // ------------------------------------------------------------------------
+    // Gives out 1000 nickels to anyone calling it
+    // as long as they never claimed it
+    // ------------------------------------------------------------------------
+   function getFreeStanleys() public returns (bool success) {
+        if(  !freebies[msg.sender] && balanceOf(owner) > 1000){
+            freebies[msg.sender] = true;
+            allowed[owner][msg.sender] = 1000;
+            emit Approval(owner, msg.sender, 1000);
+            transferFrom(owner, msg.sender,1000);
+             return true;
+        } else {
+            return false;
+        }
+       
+       
+   }
+   
     // ------------------------------------------------------------------------
     // fallbadck function
     // this is how someone gets their initial token from this contract
     // ------------------------------------------------------------------------
     function () external payable {
-        revert();
+       revert();
+        
     }
 
 
